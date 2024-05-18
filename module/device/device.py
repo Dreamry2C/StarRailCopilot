@@ -91,7 +91,7 @@ class Device(Screenshot, Control, AppControl):
         available = self.nemu_ipc_available()
         logger.attr('nemu_ipc_available', available)
         if available:
-            self.config.override(Emulator_ScreenshotMethod='nemu_ipc')
+            self.config.override(Emulator_ScreenshotMethod='scrcpy')
 
         self.screenshot_interval_set()
         self.method_check()

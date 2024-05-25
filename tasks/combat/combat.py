@@ -126,8 +126,9 @@ class Combat(CombatInteract, CombatPrepare, CombatState, CombatTeam, CombatSuppo
                 self.map_A_timer.reset()
             if self.appear(COMBAT_PREPARE, interval=2):
                 if self.obtained_is_full(self.dungeon):
-                    self.combat_exit()
-                    self.config.task_stop()
+                    # Update stamina so task can be delayed if both obtained_is_full and stamina exhausted
+                    self.combat_get_trailblaze_power()
+                    return False
                 if not self.handle_combat_prepare():
                     return False
                 self.device.click(COMBAT_PREPARE)
@@ -193,18 +194,17 @@ class Combat(CombatInteract, CombatPrepare, CombatState, CombatTeam, CombatSuppo
             in: COMBAT_AGAIN
         """
         current = self.combat_get_trailblaze_power(expect_reduce=self.combat_wave_cost > 0)
+        # Planner
+        logger.attr('obtain_frequent_check', self.obtain_frequent_check)
+        if self.obtain_frequent_check:
+            logger.info('Exit combat to check obtained items')
+            return False
         # Wave limit
         if self.combat_wave_limit:
             if self.combat_wave_done + self.combat_waves > self.combat_wave_limit:
                 logger.info(f'Combat wave limit: {self.combat_wave_done}/{self.combat_wave_limit}, '
                             f'can not run again')
                 return False
-        # Planner
-        logger.attr('obtain_frequent_check', self.obtain_frequent_check)
-        if self.obtain_frequent_check:
-            logger.info('Exit combat to check obtained items')
-            return False
-
         # Cost limit
         if self.combat_wave_cost == 10:
             if current >= self.combat_wave_cost * self.combat_waves:
@@ -229,6 +229,19 @@ class Combat(CombatInteract, CombatPrepare, CombatState, CombatTeam, CombatSuppo
         Returns:
             bool: True to re-enter combat and run with another wave settings
         """
+        # Planner
+        logger.attr('obtain_frequent_check', self.obtain_frequent_check)
+        if self.obtain_frequent_check:
+            if self.config.stored.TrailblazePower.value >= self.combat_wave_cost \
+                    and (self.combat_wave_limit and self.combat_wave_done < self.combat_wave_limit):
+                logger.info(f'Stall having some trailblaze power '
+                            f'but wave limit reached {self.combat_wave_done}/{self.combat_wave_limit}, '
+                            f'ignore obtain_frequent_check cause will reenter later')
+                return False
+            else:
+                logger.info('Re-enter combat to check obtained items')
+                return True
+        # Stamina
         if self.config.stored.TrailblazePower.value < self.combat_wave_cost:
             logger.info('Current trailblaze power is not enough for next run')
             return False
@@ -374,6 +387,8 @@ class Combat(CombatInteract, CombatPrepare, CombatState, CombatTeam, CombatSuppo
             finish = self.combat_finish()
             if self._combat_should_reenter():
                 continue
+            # Reset combat_wave_cost, so handle_combat_interact() won't activate before handle_combat_prepare()
+            self.combat_wave_cost = 10
             if finish:
                 break
 

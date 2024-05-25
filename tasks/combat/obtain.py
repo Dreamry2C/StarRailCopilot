@@ -4,12 +4,12 @@ from module.base.timer import Timer
 from module.exception import ScriptError
 from module.logger import logger
 from module.ocr.ocr import Digit
-from tasks.combat.assets.assets_combat_prepare import COMBAT_PREPARE, WAVE_MINUS, WAVE_PLUS
 from tasks.combat.assets.assets_combat_obtain import *
+from tasks.combat.assets.assets_combat_prepare import COMBAT_PREPARE
 from tasks.dungeon.keywords import DungeonList
 from tasks.planner.keywords import ITEM_CLASSES
 from tasks.planner.model import ObtainedAmmount, PlannerMixin
-from tasks.planner.result import OcrItemName
+from tasks.planner.scan import OcrItemName
 
 
 class OcrItemAmount(Digit):
@@ -87,10 +87,8 @@ class CombatObtain(PlannerMixin):
             else:
                 self.device.screenshot()
 
-            if not self.appear(ITEM_CLOSE) and self.appear(COMBAT_PREPARE):
-                if self.image_color_count(WAVE_MINUS, color=(246, 246, 246), threshold=221, count=100) \
-                        or self.image_color_count(WAVE_PLUS, color=(246, 246, 246), threshold=221, count=100):
-                    break
+            if not self.appear(ITEM_CLOSE) and self.appear(COMBAT_PREPARE) and self.appear(MAY_OBTAIN):
+                break
             if self.appear_then_click(ITEM_CLOSE, interval=2):
                 continue
 
@@ -187,6 +185,9 @@ class CombatObtain(PlannerMixin):
         index = 1
         prev = None
         items = []
+
+        self._find_may_obtain()
+
         for _ in range(5):
             entry = self._obtain_get_entry(dungeon, index=index, prev=prev)
             if entry is None:
@@ -240,8 +241,24 @@ class CombatObtain(PlannerMixin):
             return True
 
         # obtain_frequent_check
-        self.obtain_frequent_check = True
+        # approaching = row.is_approaching_total()
+        # logger.attr('is_approaching_total', approaching)
+        # self.obtain_frequent_check = approaching
         return False
+
+    def _find_may_obtain(self, skip_first_screenshot=True):
+        logger.info('Find may obtain')
+        while 1:
+            if skip_first_screenshot:
+                skip_first_screenshot = False
+            else:
+                self.device.screenshot()
+
+            if MAY_OBTAIN.match_template(self.device.image):
+                OBTAIN_1.load_offset(MAY_OBTAIN)
+                OBTAIN_2.load_offset(MAY_OBTAIN)
+                OBTAIN_3.load_offset(MAY_OBTAIN)
+                return True
 
 
 if __name__ == '__main__':

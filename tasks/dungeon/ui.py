@@ -591,7 +591,9 @@ class DungeonUI(DungeonState):
                 break
 
             # Additional
-            pass
+            # Popup that confirm character switch
+            if self.handle_popup_confirm():
+                continue
 
             # Click teleport
             if self.appear(page_guide.check_button, interval=1):

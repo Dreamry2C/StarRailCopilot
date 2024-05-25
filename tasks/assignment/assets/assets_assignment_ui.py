@@ -3,6 +3,40 @@ from module.base.button import Button, ButtonWrapper
 # This file was auto-generated, do not modify it manually. To generate:
 # ``` python -m dev_tools.button_extract ```
 
+ALL_ABOUT_BOOTHILL_CHECK = ButtonWrapper(
+    name='ALL_ABOUT_BOOTHILL_CHECK',
+    cn=Button(
+        file='./assets/cn/assignment/ui/ALL_ABOUT_BOOTHILL_CHECK.png',
+        area=(153, 98, 226, 118),
+        search=(133, 78, 246, 138),
+        color=(186, 180, 164),
+        button=(153, 98, 226, 118),
+    ),
+    en=Button(
+        file='./assets/en/assignment/ui/ALL_ABOUT_BOOTHILL_CHECK.png',
+        area=(154, 89, 240, 129),
+        search=(134, 69, 260, 149),
+        color=(207, 201, 183),
+        button=(154, 89, 240, 129),
+    ),
+)
+ALL_ABOUT_BOOTHILL_CLICK = ButtonWrapper(
+    name='ALL_ABOUT_BOOTHILL_CLICK',
+    cn=Button(
+        file='./assets/cn/assignment/ui/ALL_ABOUT_BOOTHILL_CLICK.png',
+        area=(153, 98, 227, 119),
+        search=(133, 78, 247, 139),
+        color=(80, 79, 77),
+        button=(153, 98, 227, 119),
+    ),
+    en=Button(
+        file='./assets/en/assignment/ui/ALL_ABOUT_BOOTHILL_CLICK.png',
+        area=(154, 90, 241, 128),
+        search=(134, 70, 261, 148),
+        color=(59, 57, 56),
+        button=(154, 90, 241, 128),
+    ),
+)
 CHARACTER_MATERIALS_CHECK = ButtonWrapper(
     name='CHARACTER_MATERIALS_CHECK',
     cn=Button(
@@ -80,6 +114,23 @@ ENTRY_LOADED = ButtonWrapper(
         search=(454, 141, 511, 635),
         color=(197, 193, 186),
         button=(474, 161, 491, 615),
+    ),
+)
+EVENT_COMPLETED = ButtonWrapper(
+    name='EVENT_COMPLETED',
+    cn=Button(
+        file='./assets/cn/assignment/ui/EVENT_COMPLETED.png',
+        area=(700, 300, 752, 331),
+        search=(680, 280, 772, 351),
+        color=(223, 215, 195),
+        button=(700, 300, 752, 331),
+    ),
+    en=Button(
+        file='./assets/en/assignment/ui/EVENT_COMPLETED.png',
+        area=(721, 302, 851, 331),
+        search=(701, 282, 871, 351),
+        color=(229, 220, 200),
+        button=(721, 302, 851, 331),
     ),
 )
 EXP_MATERIALS_CREDITS_CHECK = ButtonWrapper(

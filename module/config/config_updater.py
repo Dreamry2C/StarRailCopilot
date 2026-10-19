@@ -885,6 +885,10 @@ class ConfigUpdater:
 
     @staticmethod
     def update_state(data):
+        if deep_get(data, keys='Alas.Emulator.GameClient') == 'cloud_direct':
+            deep_set(data, keys='Rogue.Scheduler.Enable', value=False)
+            for arg in ('UseImmersifier', 'UseStamina', 'DoubleEvent'):
+                deep_set(data, keys=f'Rogue.RogueWorld.{arg}', value=False)
         # Limit setting combinations
         if deep_get(data, keys='Rogue.RogueWorld.UseImmersifier') is False:
             deep_set(data, keys='Rogue.RogueWorld.UseStamina', value=False)
@@ -896,7 +900,7 @@ class ConfigUpdater:
         if deep_get(data, keys='Rogue.RogueWorld.UseImmersifier') is True:
             deep_set(data, keys='Dungeon.Scheduler.Enable', value=True)
         # Cloud settings
-        if deep_get(data, keys='Alas.Emulator.GameClient') == 'cloud_android':
+        if deep_get(data, keys='Alas.Emulator.GameClient') in ('cloud_android', 'cloud_direct'):
             deep_set(data, keys='Alas.Emulator.PackageName', value='CN-Official')
 
         return data
@@ -933,9 +937,13 @@ class ConfigUpdater:
             yield 'Rogue.RogueWorld.UseImmersifier', True
         if key == 'Rogue.RogueWorld.DoubleEvent' and value is True:
             yield 'Rogue.RogueWorld.UseImmersifier', True
-        if key == 'Alas.Emulator.GameClient' and value == 'cloud_android':
+        if key == 'Alas.Emulator.GameClient' and value in ('cloud_android', 'cloud_direct'):
             yield 'Alas.Emulator.PackageName', 'CN-Official'
             yield 'Alas.Optimization.WhenTaskQueueEmpty', 'close_game'
+            if value == 'cloud_direct':
+                yield 'Rogue.Scheduler.Enable', False
+                for arg in ('UseImmersifier', 'UseStamina', 'DoubleEvent'):
+                    yield f'Rogue.RogueWorld.{arg}', False
         # Sync Dungeon.TrailblazePower and Ornament.TrailblazePower
         if key == 'Dungeon.TrailblazePower.ExtractReservedTrailblazePower':
             yield 'Ornament.TrailblazePower.ExtractReservedTrailblazePower', value
@@ -962,6 +970,11 @@ class ConfigUpdater:
         Yields:
             str: Arg path that should be hidden
         """
+        if deep_get(data, 'Alas.Emulator.GameClient') == 'cloud_direct':
+            for arg in ('Serial', 'ScreenshotMethod', 'ControlMethod', 'AdbRestart'):
+                yield f'Alas.Emulator.{arg}'
+            for arg in ('Emulator', 'name', 'path'):
+                yield f'Alas.EmulatorInfo.{arg}'
         currency = deep_get(data, 'CurrencyWars.CurrencyWars', {})
         divergent = deep_get(data, 'DivergentUniverse.DivergentUniverse', {})
         if divergent.get('Mode', 'first_station') == 'first_station':

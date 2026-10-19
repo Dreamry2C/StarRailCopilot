@@ -6,7 +6,10 @@ config/*.ini
 config/*.yaml
 !config/deploy.*.yaml
 config/*.json
+config/cloud/
 config/tmp*
+.local/
+.tmp/
 !config/template*.json
 *.pyw
 dev_tools/debug_tools

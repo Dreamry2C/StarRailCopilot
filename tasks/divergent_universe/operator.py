@@ -229,6 +229,9 @@ class DivergentOperator(MobileOperator):
         # return arrow / exit control has different semantics from PC Esc.
         if self.image.mean() < 3:
             return False
+        if self.text(('点击空白处关闭', '点击空白处继续'), (0.2, 0.4, 0.8, 0.95)):
+            self.device.adb_shell(["input", "keyevent", "4"])
+            return True
         if self.text('阈值协议', (0.12, 0.22, 0.3, 0.31), exact=True):
             return self.click_point(1058 / 1280, 195 / 720, tag='DU_PROTOCOL_INFO_CLOSE')
         if self.text('确认退出游戏', (0.25, 0.3, 0.8, 0.65)):

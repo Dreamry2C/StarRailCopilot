@@ -451,7 +451,7 @@ class AzurLaneConfig(ConfigUpdater, ManualConfig, GeneratedConfig, ConfigWatcher
             bool: If called.
         """
         if not self.is_task_supported(task):
-            logger.warning(f'Task `{task}` is disabled in cloud protocol mode')
+            logger.warning(f'Task `{task}` is not supported by the selected backend')
             return False
         if deep_get(self.data, keys=f"{task}.Scheduler.NextRun", default=None) is None:
             raise ScriptError(f"Task to call: `{task}` does not exist in user config")

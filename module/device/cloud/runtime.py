@@ -570,6 +570,6 @@ class CloudProxy:
         generation = self._operation_checkpoint()
         self._call("input", validate_input(dict(type="clipboard", text=text)), generation)
 
-    def stop(self):
+    def stop(self, revoke=False, **kwargs):
         self._heartbeat_stop.set()
         self._call("stop", timeout=70)

@@ -1,9 +1,16 @@
+from module.device.cloud import backend
 from module.alas import AzurLaneAutoScript
 from module.exception import RequestHumanTakeover
 from module.logger import logger
 
 
 class StarRailCopilot(AzurLaneAutoScript):
+    def __init__(self, config_name='alas'):
+        super().__init__(config_name)
+        if self.config.is_cloud_direct and backend is None:
+            logger.critical('当前设备后端不受支持。')
+            raise SystemExit(1)
+
     def restart(self):
         from tasks.login.login import Login
         Login(self.config, device=self.device).app_restart()
@@ -29,13 +36,15 @@ class StarRailCopilot(AzurLaneAutoScript):
 
     def error_postprocess(self):
         # Exit cloud game to reduce extra fee
+        if self.config.is_cloud_direct and backend is None:
+            return
         if self.config.is_cloud_game:
             from tasks.login.login import Login
             if self.config.is_cloud_direct:
                 try:
                     Login(self.config, device=self.device).app_stop()
                 except RequestHumanTakeover as exc:
-                    logger.error(f'Cloud cleanup was not confirmed: {exc}')
+                    logger.error(f'Device cleanup was not confirmed: {exc}')
             else:
                 Login(self.config, device=self.device).app_stop()
 

@@ -7,7 +7,7 @@ from pynput import keyboard
 from module.config.config import AzurLaneConfig
 from module.config.utils import alas_instance
 from module.device.connection import Connection, ConnectionAttr
-from module.device.device import create_device
+from module.device.factory import create_device
 from module.logger import logger
 
 """

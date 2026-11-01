@@ -885,7 +885,8 @@ class ConfigUpdater:
 
     @staticmethod
     def update_state(data):
-        if deep_get(data, keys='Alas.Emulator.GameClient') == 'cloud_direct':
+        game_client = deep_get(data, keys='Alas.Emulator.GameClient')
+        if game_client == 'cloud_direct':
             deep_set(data, keys='Rogue.Scheduler.Enable', value=False)
             for arg in ('UseImmersifier', 'UseStamina', 'DoubleEvent'):
                 deep_set(data, keys=f'Rogue.RogueWorld.{arg}', value=False)
@@ -900,7 +901,7 @@ class ConfigUpdater:
         if deep_get(data, keys='Rogue.RogueWorld.UseImmersifier') is True:
             deep_set(data, keys='Dungeon.Scheduler.Enable', value=True)
         # Cloud settings
-        if deep_get(data, keys='Alas.Emulator.GameClient') in ('cloud_android', 'cloud_direct'):
+        if game_client in ('cloud_android', 'cloud_direct'):
             deep_set(data, keys='Alas.Emulator.PackageName', value='CN-Official')
 
         return data

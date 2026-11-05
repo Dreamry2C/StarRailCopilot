@@ -34,7 +34,7 @@ else:
 
             @staticmethod
             def add_preview_routes(app, key=None, cdn=None):
-                from module.webui.cloud import add_preview_routes
+                from module.webui.cloud_preview import add_preview_routes
                 return add_preview_routes(app, key=key, cdn=cdn)
 
             @staticmethod
@@ -44,7 +44,7 @@ else:
 
             @property
             def CloudConnectionError(self):
-                from module.device.cloud.core.session import CloudConnectionError
+                from module.device.cloud.client import CloudConnectionError
                 return CloudConnectionError
 
             @property

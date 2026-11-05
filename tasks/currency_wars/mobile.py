@@ -1340,7 +1340,7 @@ class MobileCurrencyWars(StrategyEngine):
             if self.is_item_selection() or op.text(
                     ('补给阶段', '遭遇节点', '选择投资策略', '选择投资环境',
                      '命运卜者', '盛会之星', '选择伙伴', '祈愿试炼', '我来当策划'),
-                    (0.1, 0.09, 0.95, 0.22)):
+                    (0.1, 0, 0.95, 0.22)):
                 logger.info('CW pending node opened; hand over from combat wait to stage selection')
                 return True
             if op.click_text('确认', (0.3, 0.5, 0.85, 0.9), after_sleep=0.5):

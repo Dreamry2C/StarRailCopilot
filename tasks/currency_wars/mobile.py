@@ -1440,19 +1440,39 @@ class MobileCurrencyWars(StrategyEngine):
                      sum(t in traits for t in self.target_synergies),
                      character.name in self.strategy_characters, character.cost)
             choices.append((score, box))
-        if choices:
-            _, chosen = max(choices, key=lambda item: item[0])
-            logger.info(f'CW supply choice: {chosen.source}; candidates={len(choices)}')
-            op.click_box(chosen, after_sleep=0.4)
-        elif not op.text('已选择1/1', (0.7, 0.8, 1, 0.89)):
-            raise RuntimeError('补给角色未识别且没有已选项')
-        for _ in range(4):
+        chosen = max(choices, key=lambda item: item[0])[1] if choices else None
+        selection_clicked = False
+        missing_frames = 0
+        confirmations = 0
+        for _ in range(20):
             op.snapshot()
-            if not op.text('补给阶段', (0.1, 0, 0.9, 0.2)):
-                self.roster_dirty = True
-                return
-            if not op.click_text(('确认', '确认选择', '选择'), (0.5, 0.7, 1, 1), after_sleep=1.2, exact=True):
+            selected = op.text_ocr(('已选择0/1', '已选择1/1'), (0.7, 0.8, 1, 0.89), exact=True)
+            # The title template can miss an animation frame. The selection
+            # counter also identifies this page; require a stable disappearance.
+            if not (selected or op.text('补给阶段', (0.1, 0, 0.9, 0.2))
+                    or op.text_ocr('补给阶段', (0.1, 0, 0.9, 0.2), exact=True)):
+                missing_frames += 1
+                if missing_frames >= 3:
+                    self.roster_dirty = True
+                    return
                 op.sleep(0.4)
+                continue
+            missing_frames = 0
+            if selected and normalize(selected.source) == '已选择0/1' and not selection_clicked:
+                if chosen is None:
+                    raise RuntimeError('补给角色未识别且没有已选项')
+                logger.info(f'CW supply choice: {chosen.source}; candidates={len(choices)}')
+                op.click_box(chosen, after_sleep=0.8)
+                # Clicking a card again toggles it off, even if the previous
+                # screenshot has not yet reflected the first click.
+                selection_clicked = True
+                continue
+            if selected and normalize(selected.source) == '已选择1/1' and confirmations < 4:
+                if op.click_text(('确认', '确认选择'), (0.73, 0.88, 0.99, 0.96),
+                                 after_sleep=1.2, exact=True):
+                    confirmations += 1
+                    continue
+            op.sleep(0.4)
         op.save('supply_confirmation_failed')
         raise RuntimeError('补给选择确认后未离开补给界面')
 

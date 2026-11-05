@@ -557,14 +557,24 @@ class MobileCurrencyWars(StrategyEngine):
         # The strategy page loads through a black transition. Use the same
         # native catalog/input workflow as arbitrary strategy-code parsing.
         NativeStrategy(op, self).open_code(self.strategy_code, read=False)
+        apply_clicked = False
+        footer = (0.78, 0.87, 0.99, 0.97)
         for _ in range(20):
             op.snapshot()
-            if op.click_text('应用攻略', after_sleep=1):
+            # An already active guide displays "Cancel application". Never
+            # toggle it off or treat its missing Apply button as an import error.
+            if op.text('取消应用', footer, exact=True):
+                logger.info('CW game confirms the selected strategy is applied')
                 break
-            op.sleep(0.3)
+            if apply_clicked and self.is_board():
+                break
+            if op.click_text('应用攻略', footer, after_sleep=1, exact=True):
+                apply_clicked = True
+            else:
+                op.sleep(0.3)
         else:
             op.save('strategy_import_failed')
-            raise RuntimeError('攻略码导入失败，未识别到应用攻略')
+            raise RuntimeError('攻略已读取，但未确认游戏内应用状态')
         for _ in range(12):
             op.snapshot()
             if self.is_board():

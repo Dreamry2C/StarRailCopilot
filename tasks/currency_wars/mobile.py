@@ -1479,10 +1479,49 @@ class MobileCurrencyWars(StrategyEngine):
     def handle_encounter_node(self, _=None):
         op = self.operator
         op.save(f'encounter_{self.rounds}')
-        op.click_point(0.35, 0.5, after_sleep=0.4, tag='CW_ENCOUNTER_EASY')
-        op.snapshot()
-        if not op.click_text(('确认', '确认选择', '选择'), (0.1, 0.7, 0.9, 1), after_sleep=1.2, exact=True):
-            raise RuntimeError('遭遇节点确认按钮未识别')
+        footer = (0.3, 0.85, 0.8, 0.98)
+        labels = ('确认', '确认选择', '选择')
+        ready_frames = 0
+        missing_frames = 0
+        selection_clicked = False
+        confirmations = 0
+        for _ in range(30):
+            op.snapshot()
+            title = (op.text('遭遇节点', (0.1, 0, 0.9, 0.2))
+                     or op.text_ocr('遭遇节点', (0.1, 0, 0.9, 0.2), exact=True))
+            confirm = op.text(labels, footer, exact=True)
+            visible_footer = confirm or op.text_ocr(labels, footer, exact=True)
+            if not title and not visible_footer:
+                missing_frames += 1
+                if confirmations and missing_frames >= 3:
+                    return
+            else:
+                missing_frames = 0
+            # The title appears before the cards accept input. Wait for their
+            # reward details and footer on consecutive frames before selecting.
+            if not (title and visible_footer
+                    and op.text_ocr('奖励预览', (0.1, 0.5, 0.9, 0.6), exact=True)):
+                ready_frames = 0
+                op.sleep(0.4)
+                continue
+            ready_frames += 1
+            if ready_frames < 2:
+                op.sleep(0.4)
+                continue
+            # The enabled-button template has dark text on a light background;
+            # OCR alone also reads the disabled button during the entrance.
+            if confirm:
+                if confirmations < 4:
+                    op.click_box(confirm, after_sleep=1.2)
+                    confirmations += 1
+                    continue
+            elif not selection_clicked:
+                op.click_point(0.35, 0.5, after_sleep=0.8, tag='CW_ENCOUNTER_EASY')
+                selection_clicked = True
+                continue
+            op.sleep(0.4)
+        op.save('encounter_confirmation_failed')
+        raise RuntimeError('遭遇节点选择或确认超时，尚未离开选择界面')
 
     def detect_special_event(self):
         self.operator.snapshot()

@@ -232,37 +232,51 @@ class NativeStrategy:
 
     def clipboard_code(self):
         device = self.op.device
-        device.scrcpy_init()
-        from module.device.method.scrcpy import const
-        control = device._scrcpy_control
-        sock = control.control_socket
-        with control.control_socket_lock:
-            sock.setblocking(False)
-            try:
-                while sock.recv(1024):
-                    pass
-            except BlockingIOError:
-                pass
-            sock.settimeout(3)
-            sock.sendall(struct.pack('>B', const.TYPE_GET_CLIPBOARD))
+        created = not device._scrcpy_alive
+        shared = 'scrcpy' in (self.op.config.Emulator_ScreenshotMethod,
+                             self.op.config.Emulator_ControlMethod)
+        try:
+            if created:
+                device.scrcpy_init()
+            from module.device.method.scrcpy import const
+            control = device._scrcpy_control
+            sock = control.control_socket
+            with control.control_socket_lock:
+                timeout = sock.gettimeout()
+                try:
+                    sock.setblocking(False)
+                    try:
+                        while sock.recv(1024):
+                            pass
+                    except BlockingIOError:
+                        pass
+                    sock.settimeout(3)
+                    sock.sendall(struct.pack('>B', const.TYPE_GET_CLIPBOARD))
 
-            def receive(length):
-                data = bytearray()
-                while len(data) < length:
-                    packet = sock.recv(length - len(data))
-                    if not packet:
-                        raise ConnectionError('Scrcpy clipboard channel closed')
-                    data.extend(packet)
-                return bytes(data)
+                    def receive(length):
+                        data = bytearray()
+                        while len(data) < length:
+                            packet = sock.recv(length - len(data))
+                            if not packet:
+                                raise ConnectionError('Scrcpy clipboard channel closed')
+                            data.extend(packet)
+                        return bytes(data)
 
-            kind, length = struct.unpack('>BI', receive(5))
-            if kind != 0 or length > 65536:
-                raise ValueError('Invalid clipboard response')
-            code = extract_code(receive(length).decode('utf-8'))
-            sock.setblocking(True)
-        if not code:
-            raise ValueError('Game clipboard did not contain a strategy code')
-        return code
+                    kind, length = struct.unpack('>BI', receive(5))
+                    if kind != 0 or length > 65536:
+                        raise ValueError('Invalid clipboard response')
+                    code = extract_code(receive(length).decode('utf-8'))
+                finally:
+                    sock.settimeout(timeout)
+            if not code:
+                raise ValueError('Game clipboard did not contain a strategy code')
+            return code
+        finally:
+            # v1.20 listens for later clipboard changes while connected. A
+            # one-shot guide read must not leave that listener running, but an
+            # existing session or configured screenshot/control session is shared.
+            if created and not shared:
+                device._scrcpy_server_stop()
 
     def read_character(self, bounds, index):
         from tasks.currency_wars.mobile import MobileCurrencyWars

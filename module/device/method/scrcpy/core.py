@@ -234,4 +234,5 @@ class ScrcpyCore(Connection):
                 logger.error(f'_scrcpy_stream_loop_thread exception: {repr(e)}')
                 raise
 
-        raise ScrcpyError('_scrcpy_stream_loop stopped')
+        # _scrcpy_server_stop() deliberately ends this loop.
+        return

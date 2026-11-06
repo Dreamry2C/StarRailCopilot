@@ -606,14 +606,36 @@ class MobileCurrencyWars(StrategyEngine):
             return False
         if not self.select_uncollected():
             op.click_point(0.5, 0.4, after_sleep=0.3, tag=f'CW_{title}_MIDDLE')
-        op.snapshot()
-        if not op.click_text(('确认', '确认选择', '选择'), (0, 0.7, 1, 1), after_sleep=1.2, exact=True):
+        deadline = time.monotonic() + 10
+        missing_frames = 0
+        confirmations = 0
+        next_titles = tuple(name for name in (
+            '选择投资环境', '选择投资策略', '补给阶段', '遭遇节点', '命运卜者',
+            '盛会之星', '选择伙伴', '祈愿试炼', '我来当策划') if title not in name)
+        while time.monotonic() < deadline:
             op.snapshot()
             if self.is_board():
                 return True
-            op.save('card_confirm_missing')
-            raise RuntimeError(f'{title}确认按钮未识别')
-        return True
+            if op.text(title, (0.1, 0, 0.9, 0.2)):
+                missing_frames = 0
+                # Clipboard toasts can cover this button. Keep the chosen card
+                # and retry only its confirmation while the same page is visible.
+                if confirmations < 4 and op.click_text(
+                        ('确认', '确认选择', '选择'), (0, 0.7, 1, 1), after_sleep=1.2, exact=True):
+                    confirmations += 1
+                    continue
+            elif (self.is_item_selection() or op.text(next_titles, (0.1, 0, 0.95, 0.22))
+                  or op.text(('点击空白处关闭', '点击空白处继续'), (0.1, 0.5, 0.9, 0.98))):
+                # A missing title or a black loading frame alone cannot prove
+                # success. Observe the next known page before returning.
+                missing_frames += 1
+                if missing_frames >= 3:
+                    return True
+            else:
+                missing_frames = 0
+            op.sleep(0.3)
+        op.save('card_confirm_missing')
+        raise RuntimeError(f'{title}选择或确认超时，尚未离开选择界面')
 
     def select_uncollected(self):
         op = self.operator

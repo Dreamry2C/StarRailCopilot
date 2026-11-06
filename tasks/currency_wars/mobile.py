@@ -257,10 +257,13 @@ class MobileCurrencyWars(StrategyEngine):
         if not self.is_interrupted_battle_board():
             return False
         op = self.operator
-        op.sleep(0.4)
-        op.snapshot()
-        if not self.is_interrupted_battle_board():
-            return False
+        # Stage entrance animations can briefly gray out the shop before it
+        # opens normally. Require the locked state to persist for two seconds.
+        for _ in range(5):
+            op.sleep(0.4)
+            op.snapshot()
+            if not self.is_interrupted_battle_board():
+                return False
         self.last_stage = self.stage_id()
         logger.info(f'CW resume locked node: {self.last_stage}; shop disabled, enter the pending battle or event')
         op.save('resume_interrupted_battle')
@@ -1332,6 +1335,8 @@ class MobileCurrencyWars(StrategyEngine):
         deadline = time.monotonic() + 600
         started_at = time.monotonic()
         confirmations = 0
+        combat_seen = False
+        board_ready_frames = 0
         while time.monotonic() < deadline:
             op.snapshot()
             # A locked board's deployment button can reopen a supply/event,
@@ -1344,6 +1349,7 @@ class MobileCurrencyWars(StrategyEngine):
                 logger.info('CW pending node opened; hand over from combat wait to stage selection')
                 return True
             if op.click_text('确认', (0.3, 0.5, 0.85, 0.9), after_sleep=0.5):
+                board_ready_frames = 0
                 confirmations += 1
                 if confirmations >= 3:
                     op.save('battle_confirmation_blocked')
@@ -1363,15 +1369,29 @@ class MobileCurrencyWars(StrategyEngine):
                 return True
             # Reuse SRC's combat button detection and activity watchdog.
             if combat.is_combat_executing():
+                combat_seen = True
                 combat.handle_combat_state(auto=True, speed_2x=True)
                 op.device.stuck_record_clear()
             if self.is_board():
                 if self.stage_id() != self.last_stage:
                     self.rounds += 1
                     return True
-                if time.monotonic() - started_at >= 8:
+                if (self.pending_combat and not combat_seen
+                        and op.text('ShopView', (0, 0, 0.18, 0.18))):
+                    board_ready_frames += 1
+                    if board_ready_frames >= 2:
+                        # The apparent lock was temporary. Reuse the normal
+                        # stage/preparation route without counting a battle.
+                        logger.info(f'CW recovered normal shop at {self.last_stage}; return to preparation')
+                        self.pending_combat = False
+                        return True
+                else:
+                    board_ready_frames = 0
+                if not board_ready_frames and time.monotonic() - started_at >= 8:
                     op.save('battle_not_started')
                     return False
+            else:
+                board_ready_frames = 0
             op.sleep(0.8)
         op.save('battle_timeout')
         raise TimeoutError('货币战争战斗等待超时')

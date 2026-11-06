@@ -9,6 +9,7 @@ import numpy as np
 
 from module.base.button import ClickButton
 from module.base.timer import Timer
+from module.logger import logger
 
 from tasks.currency_wars.operator import Box, MobileOperator
 
@@ -39,6 +40,14 @@ class DivergentOperator(MobileOperator):
             self._ocr_cache.clear()
             self.frame_cache.clear()
             self.boxes = []
+            # The Android quit dialog leaves the world HUD visible behind it.
+            # Dismiss it before any caller can treat that HUD as a playable map.
+            if self.template('quit_confirm', (0.4, 0.37, 0.6, 0.45), confidence=0.93):
+                if timeout.reached():
+                    raise TimeoutError('退出游戏确认框未能取消')
+                if self.click_text('取消', (0.25, 0.4, 0.55, 0.7), exact=True):
+                    logger.info('DU cancelled Android quit dialog; await the unobstructed page')
+                continue
             handled = self.popups.handle_monthly_card_reward(interval=1)
             if not (handled or self.popups.appear(MONTHLY_CARD_REWARD)
                     or self.popups.appear(MONTHLY_CARD_GET_ITEM)):
@@ -229,9 +238,9 @@ class DivergentOperator(MobileOperator):
         # return arrow / exit control has different semantics from PC Esc.
         if self.image.mean() < 3:
             return False
-        if self.text(('点击空白处关闭', '点击空白处继续'), (0.2, 0.4, 0.8, 0.95)):
-            self.device.adb_shell(["input", "keyevent", "4"])
-            return True
+        close = self.text(('点击空白处关闭', '点击空白处继续'), (0.2, 0.4, 0.8, 0.95))
+        if close:
+            return self.click_box(close)
         if self.text('阈值协议', (0.12, 0.22, 0.3, 0.31), exact=True):
             return self.click_point(1058 / 1280, 195 / 720, tag='DU_PROTOCOL_INFO_CLOSE')
         if self.text('确认退出游戏', (0.25, 0.3, 0.8, 0.65)):

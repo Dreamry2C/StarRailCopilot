@@ -2340,7 +2340,11 @@ class DivergentUniverse(DungeonUINav, MapControl):
         op = self.op
         title = self.header_text()
         if any(word in title for word in self.REWARD_TITLES):
-            if op.click_box(self.reward_close_button()):
+            close = self.reward_close_button()
+            if close:
+                # A throttled click still identifies a closeable reward page.
+                # Wait for the next frame instead of trying another control.
+                op.click_box(close)
                 return True
             if not op.click_text(('确定', '确认', '继续'), (0.1, 0.6, 1, 1)):
                 op.back()

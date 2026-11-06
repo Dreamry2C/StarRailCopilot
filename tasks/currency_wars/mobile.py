@@ -1436,21 +1436,6 @@ class MobileCurrencyWars(StrategyEngine):
         op = self.operator
         op.save(f'supply_{self.rounds}')
         from tasks.currency_wars.synergy import extract_traits
-        choices = []
-        # Both four- and five-card supplies use this name row. Use the actual
-        # name positions so traits and clicks belong to the same offered card.
-        for box in op.read_region((0.025, 365 / 720, 0.98, 398 / 720), snapshot=False):
-            character = self.character_from_text(box.source)
-            if character is None:
-                continue
-            labels = op.read_region((max(0, box.left - 10) / 1280, 282 / 720,
-                                     min(1280, box.left + 175) / 1280, 365 / 720), snapshot=False)
-            traits = extract_traits(' '.join(b.source for b in labels))
-            score = (sum(t in traits for t in self.required_synergies),
-                     sum(t in traits for t in self.target_synergies),
-                     character.name in self.strategy_characters, character.cost)
-            choices.append((score, box))
-        chosen = max(choices, key=lambda item: item[0])[1] if choices else None
         selection_clicked = False
         missing_frames = 0
         confirmations = 0
@@ -1469,8 +1454,29 @@ class MobileCurrencyWars(StrategyEngine):
                 continue
             missing_frames = 0
             if selected and normalize(selected.source) == '已选择0/1' and not selection_clicked:
-                if chosen is None:
-                    raise RuntimeError('补给角色未识别且没有已选项')
+                choices = []
+                # Two equipment rewards raise the card's name and traits.
+                # Read the current frame and keep both rows within the portrait,
+                # away from the equipment names below it.
+                for top, bottom in ((365, 398), (320, 365)):
+                    for box in op.read_region((0.025, top / 720, 0.98, bottom / 720), snapshot=False):
+                        character = self.character_from_text(box.source)
+                        if character is None:
+                            continue
+                        labels = op.read_region((max(0, box.left - 10) / 1280, max(0, box.top - 86) / 720,
+                                                 min(1280, box.left + 175) / 1280, box.top / 720), snapshot=False)
+                        traits = extract_traits(' '.join(b.source for b in labels))
+                        score = (sum(t in traits for t in self.required_synergies),
+                                 sum(t in traits for t in self.target_synergies),
+                                 character.name in self.strategy_characters, character.cost)
+                        choices.append((score, box))
+                    if choices:
+                        break
+                if not choices:
+                    # The counter can appear before the card's entrance ends.
+                    op.sleep(0.4)
+                    continue
+                chosen = max(choices, key=lambda item: item[0])[1]
                 logger.info(f'CW supply choice: {chosen.source}; candidates={len(choices)}')
                 op.click_box(chosen, after_sleep=0.8)
                 # Clicking a card again toggles it off, even if the previous
@@ -1484,6 +1490,8 @@ class MobileCurrencyWars(StrategyEngine):
                     continue
             op.sleep(0.4)
         op.save('supply_confirmation_failed')
+        if selected and normalize(selected.source) == '已选择0/1' and not selection_clicked:
+            raise RuntimeError('补给角色未识别且没有已选项')
         raise RuntimeError('补给选择确认后未离开补给界面')
 
     def handle_encounter_node(self, _=None):

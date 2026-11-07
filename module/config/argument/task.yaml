@@ -62,16 +62,31 @@ Weekly:
       - Scheduler
       - Weekly
       - DungeonSupport
+    RogueWeekly:
+      - Scheduler
+      - RogueWeekly
+      - RogueStorage
+
+# ==================== Roguelike ====================
+
+Roguelike:
+  menu: 'list'
+  page: 'setting'
+  tasks:
     Rogue:
       - Scheduler
       - RogueWorld
-      - RogueStorage
       - RogueBlessing
       - RogueDebug
     # Currency Wars extension
     CurrencyWars:
       - Scheduler
       - CurrencyWars
+      - RogueBatch
+    DivergentUniverse:
+      - Scheduler
+      - DivergentUniverse
+      - RogueBatch
 
 # ==================== Tool ====================
 
@@ -90,5 +105,3 @@ Tool:
       - MemoryOfChaos
     ApocalypticShadow:
       - ApocalypticShadow
-    DivergentUniverse:
-      - DivergentUniverse

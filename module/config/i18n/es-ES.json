@@ -12,6 +12,10 @@
       "name": "Semanario",
       "help": ""
     },
+    "Roguelike": {
+      "name": "Roguelike",
+      "help": ""
+    },
     "Tool": {
       "name": "útiles",
       "help": ""
@@ -58,13 +62,21 @@
       "name": "Ecos de la guerra",
       "help": ""
     },
+    "RogueWeekly": {
+      "name": "Puntos semanales del Universo Simulado",
+      "help": "Los tres modos comparten puntos semanales (18000 actualmente). Se comprueban tras cada partida y se vuelve al programador. Al completar el límite, espera al reinicio del próximo lunes. Configura cada modo en Roguelike. Universo Diferenciado usa partidas completas para puntos semanales."
+    },
     "Rogue": {
       "name": "Universo Simulado",
       "help": ""
     },
     "CurrencyWars": {
       "name": "Currency Wars",
-      "help": "Standard/overclock games and takeover"
+      "help": "Inicia el programador desde Resumen. Las otras tareas pendientes se comprueban tras cada partida. Standard/overclock games and takeover"
+    },
+    "DivergentUniverse": {
+      "name": "Task.DivergentUniverse.name",
+      "help": "Inicia el programador desde Resumen. Las otras tareas pendientes se comprueban tras cada partida."
     },
     "Daemon": {
       "name": "Clic de diálogo",
@@ -85,10 +97,6 @@
     "ApocalypticShadow": {
       "name": "Sombra apocalíptica",
       "help": "Desafía Sombra apocalíptica automáticamente"
-    },
-    "DivergentUniverse": {
-      "name": "Task.DivergentUniverse.name",
-      "help": "Task.DivergentUniverse.help"
     }
   },
   "Scheduler": {
@@ -1811,6 +1819,29 @@
       "help": ""
     }
   },
+  "RogueWeekly": {
+    "_info": {
+      "name": "Puntos semanales compartidos",
+      "help": ""
+    },
+    "Mode": {
+      "name": "Modo",
+      "help": "Los tres modos comparten puntos semanales (18000 actualmente). Se comprueban tras cada partida y se vuelve al programador. Al completar el límite, espera al reinicio del próximo lunes. Configura cada modo en Roguelike. Universo Diferenciado usa partidas completas para puntos semanales.",
+      "Rogue": "Universo Simulado",
+      "DivergentUniverse": "Task.DivergentUniverse.name",
+      "CurrencyWars": "Currency Wars"
+    }
+  },
+  "RogueBatch": {
+    "_info": {
+      "name": "Progreso de partidas",
+      "help": ""
+    },
+    "CompletedRuns": {
+      "name": "Partidas completadas",
+      "help": ""
+    }
+  },
   "RogueWorld": {
     "_info": {
       "name": "Ajustes de Universo Simulado",
@@ -1931,7 +1962,7 @@
   },
   "RogueStorage": {
     "_info": {
-      "name": "Registros del Universo Simulado",
+      "name": "Puntos semanales compartidos",
       "help": ""
     },
     "SimulatedUniverse": {
@@ -2160,6 +2191,10 @@
     "Runs": {
       "name": "DivergentUniverse.Runs.name",
       "help": "DivergentUniverse.Runs.help"
+    },
+    "RepeatDaily": {
+      "name": "Repetir diariamente",
+      "help": ""
     },
     "TeamPreset": {
       "name": "DivergentUniverse.TeamPreset.name",

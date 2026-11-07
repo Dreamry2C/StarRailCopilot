@@ -12,6 +12,10 @@
       "name": "Menu.Weekly.name",
       "help": "Menu.Weekly.help"
     },
+    "Roguelike": {
+      "name": "ローグライク",
+      "help": ""
+    },
     "Tool": {
       "name": "Menu.Tool.name",
       "help": "Menu.Tool.help"
@@ -58,13 +62,21 @@
       "name": "Task.Weekly.name",
       "help": "Task.Weekly.help"
     },
+    "RogueWeekly": {
+      "name": "模擬宇宙週間ポイント",
+      "help": "3つのモードで週間ポイント（現在18000）を共有します。毎回の精算後にポイントと予定を確認し、上限で次の月曜のサーバー更新まで待機します。設定はローグライク欄で行います。週間の階差宇宙は最後まで探索します。"
+    },
     "Rogue": {
       "name": "Task.Rogue.name",
       "help": "Task.Rogue.help"
     },
     "CurrencyWars": {
       "name": "Currency Wars",
-      "help": "Standard/overclock games and takeover"
+      "help": "概要からスケジューラーを開始します。毎回の精算後に他の実行予定を確認します。 Standard/overclock games and takeover"
+    },
+    "DivergentUniverse": {
+      "name": "Task.DivergentUniverse.name",
+      "help": "概要からスケジューラーを開始します。毎回の精算後に他の実行予定を確認します。"
     },
     "Daemon": {
       "name": "Task.Daemon.name",
@@ -85,10 +97,6 @@
     "ApocalypticShadow": {
       "name": "末日の幻影",
       "help": "末日の幻影を自動挑戦"
-    },
-    "DivergentUniverse": {
-      "name": "Task.DivergentUniverse.name",
-      "help": "Task.DivergentUniverse.help"
     }
   },
   "Scheduler": {
@@ -1811,6 +1819,29 @@
       "help": "CloudStorage.CloudRemainFree.help"
     }
   },
+  "RogueWeekly": {
+    "_info": {
+      "name": "共有週間ポイント",
+      "help": ""
+    },
+    "Mode": {
+      "name": "モード",
+      "help": "3つのモードで週間ポイント（現在18000）を共有します。毎回の精算後にポイントと予定を確認し、上限で次の月曜のサーバー更新まで待機します。設定はローグライク欄で行います。週間の階差宇宙は最後まで探索します。",
+      "Rogue": "Task.Rogue.name",
+      "DivergentUniverse": "Task.DivergentUniverse.name",
+      "CurrencyWars": "Currency Wars"
+    }
+  },
+  "RogueBatch": {
+    "_info": {
+      "name": "実行状況",
+      "help": ""
+    },
+    "CompletedRuns": {
+      "name": "完了回数",
+      "help": ""
+    }
+  },
   "RogueWorld": {
     "_info": {
       "name": "RogueWorld._info.name",
@@ -1931,7 +1962,7 @@
   },
   "RogueStorage": {
     "_info": {
-      "name": "模擬宇宙記録",
+      "name": "共有週間ポイント",
       "help": ""
     },
     "SimulatedUniverse": {
@@ -2160,6 +2191,10 @@
     "Runs": {
       "name": "DivergentUniverse.Runs.name",
       "help": "DivergentUniverse.Runs.help"
+    },
+    "RepeatDaily": {
+      "name": "毎日繰り返す",
+      "help": ""
     },
     "TeamPreset": {
       "name": "DivergentUniverse.TeamPreset.name",

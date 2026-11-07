@@ -290,6 +290,20 @@
       "Replace": 4
     }
   },
+  "RogueWeekly": {
+    "Scheduler": {
+      "Enable": false,
+      "NextRun": "2020-01-01 00:00:00",
+      "Command": "RogueWeekly",
+      "ServerUpdate": "04:00"
+    },
+    "RogueWeekly": {
+      "Mode": "CurrencyWars"
+    },
+    "RogueStorage": {
+      "SimulatedUniverse": {}
+    }
+  },
   "Rogue": {
     "Scheduler": {
       "Enable": false,
@@ -308,9 +322,6 @@
       "UseStamina": false,
       "SimulatedUniverseFarm": {},
       "Team": null
-    },
-    "RogueStorage": {
-      "SimulatedUniverse": {}
     },
     "RogueBlessing": {
       "PresetBlessingFilter": "preset",
@@ -350,6 +361,40 @@
       "MaxMinutes": 120,
       "RecoveryRetries": 3,
       "SaveEvidence": false
+    },
+    "RogueBatch": {
+      "CompletedRuns": 0
+    }
+  },
+  "DivergentUniverse": {
+    "Scheduler": {
+      "Enable": false,
+      "NextRun": "2020-01-01 00:00:00",
+      "Command": "DivergentUniverse",
+      "ServerUpdate": "04:00"
+    },
+    "DivergentUniverse": {
+      "Calculation": "periodic",
+      "DifficultyMode": "current",
+      "Difficulty": 5,
+      "PollutionMode": "current",
+      "Pollution": 0,
+      "Mode": "first_station",
+      "Runs": 1,
+      "RepeatDaily": false,
+      "TeamPreset": 1,
+      "PreferUncollected": true,
+      "UseTechnique": false,
+      "StopAtWeeklyLimit": false,
+      "ClaimRewards": true,
+      "StationPriority": "战斗 > 精英 > 商店",
+      "ChoicePriority": null,
+      "MaxMinutes": 120,
+      "RecoveryRetries": 3,
+      "SaveEvidence": false
+    },
+    "RogueBatch": {
+      "CompletedRuns": 0
     }
   },
   "Daemon": {
@@ -393,27 +438,6 @@
       "SwapOnRetry": true,
       "Team1Preset": 1,
       "Team2Preset": 2
-    }
-  },
-  "DivergentUniverse": {
-    "DivergentUniverse": {
-      "Calculation": "periodic",
-      "DifficultyMode": "current",
-      "Difficulty": 5,
-      "PollutionMode": "current",
-      "Pollution": 0,
-      "Mode": "first_station",
-      "Runs": 1,
-      "TeamPreset": 1,
-      "PreferUncollected": true,
-      "UseTechnique": false,
-      "StopAtWeeklyLimit": false,
-      "ClaimRewards": true,
-      "StationPriority": "战斗 > 精英 > 商店",
-      "ChoicePriority": null,
-      "MaxMinutes": 120,
-      "RecoveryRetries": 3,
-      "SaveEvidence": false
     }
   }
 }

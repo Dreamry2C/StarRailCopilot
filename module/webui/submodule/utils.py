@@ -7,5 +7,4 @@ def get_available_func():
         'PureFiction',
         'MemoryOfChaos',
         'ApocalypticShadow',
-        'DivergentUniverse',
     )

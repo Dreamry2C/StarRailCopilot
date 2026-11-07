@@ -138,5 +138,5 @@ class StoredGenerated:
     CloudRemainSeasonPass = StoredInt("DataUpdate.CloudStorage.CloudRemainSeasonPass")
     CloudRemainPaid = StoredInt("DataUpdate.CloudStorage.CloudRemainPaid")
     CloudRemainFree = StoredInt("DataUpdate.CloudStorage.CloudRemainFree")
+    SimulatedUniverse = StoredSimulatedUniverse("RogueWeekly.RogueStorage.SimulatedUniverse")
     SimulatedUniverseFarm = StoredSimulatedUniverseElite("Rogue.RogueWorld.SimulatedUniverseFarm")
-    SimulatedUniverse = StoredSimulatedUniverse("Rogue.RogueStorage.SimulatedUniverse")

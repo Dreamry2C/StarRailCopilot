@@ -235,6 +235,12 @@ class GeneratedConfig:
     CloudStorage_CloudRemainPaid = {}
     CloudStorage_CloudRemainFree = {}
 
+    # Group `RogueWeekly`
+    RogueWeekly_Mode = 'CurrencyWars'  # Rogue, DivergentUniverse, CurrencyWars
+
+    # Group `RogueBatch`
+    RogueBatch_CompletedRuns = 0
+
     # Group `RogueWorld`
     RogueWorld_World = 'Simulated_Universe_World_8'  # Simulated_Universe_World_3, Simulated_Universe_World_4, Simulated_Universe_World_5, Simulated_Universe_World_6, Simulated_Universe_World_8
     RogueWorld_Path = 'The_Hunt'  # Preservation, Remembrance, Nihility, Abundance, The_Hunt, Destruction, Elation, Propagation, Erudition
@@ -303,6 +309,7 @@ class GeneratedConfig:
     DivergentUniverse_Pollution = 0
     DivergentUniverse_Mode = 'first_station'  # first_station, full
     DivergentUniverse_Runs = 1
+    DivergentUniverse_RepeatDaily = False
     DivergentUniverse_TeamPreset = 1  # 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
     DivergentUniverse_PreferUncollected = True
     DivergentUniverse_UseTechnique = False

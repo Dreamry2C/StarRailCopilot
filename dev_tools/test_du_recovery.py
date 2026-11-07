@@ -23,7 +23,9 @@ class RecoveryTests(unittest.TestCase):
         self.patches = [patch.object(progress, 'ROOT', self.folder),
                         patch.object(du, 'FileLock', lambda *a, **k: nullcontext()),
                         patch.object(du, 'STATE_DIR', self.folder),
-                        patch.object(du, 'save_error_log', lambda **k: None)]
+                        patch.object(du, 'save_error_log', lambda **k: None),
+                        patch('tasks.rogue_weekly.scheduler.finish_batch'),
+                        patch('tasks.rogue_weekly.scheduler.leave_lobby')]
         for p in self.patches:
             p.start()
         self.checkpoint = progress.Progress('fixture')
@@ -41,6 +43,7 @@ class RecoveryTests(unittest.TestCase):
         t.config = SimpleNamespace(Emulator_GameLanguage='cn', DivergentUniverse_Runs=runs,
                                    DivergentUniverse_RecoveryRetries=retries, config_name='fixture',
                                    DivergentUniverse_Mode='full', DivergentUniverse_Calculation='periodic',
+                                   DivergentUniverse_RepeatDaily=False,
                                    DivergentUniverse_ClaimRewards=False, Error_SaveError=False,
                                    task='DivergentUniverse', stop_event=threading.Event(),
                                    load=lambda: None, bind=lambda *a: None)
@@ -102,6 +105,9 @@ class RecoveryTests(unittest.TestCase):
             t.active['settlement_observed'] = True
             return 'win'
         t.play_run = play
+        t.run()
+        self.assertEqual([x['result'] for x in t.progress.data['history']], ['interrupted'])
+        # A new scheduler turn starts the replacement run after a real settlement.
         t.run()
         self.assertEqual([x['action'] for x in t.logins], ['resume', 'settle'])
         self.assertEqual([x['result'] for x in t.progress.data['history']], ['interrupted', 'win'])

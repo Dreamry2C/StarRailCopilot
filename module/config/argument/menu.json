@@ -25,8 +25,16 @@
     "page": "setting",
     "tasks": [
       "Weekly",
+      "RogueWeekly"
+    ]
+  },
+  "Roguelike": {
+    "menu": "list",
+    "page": "setting",
+    "tasks": [
       "Rogue",
-      "CurrencyWars"
+      "CurrencyWars",
+      "DivergentUniverse"
     ]
   },
   "Tool": {
@@ -37,8 +45,7 @@
       "PlannerScan",
       "PureFiction",
       "MemoryOfChaos",
-      "ApocalypticShadow",
-      "DivergentUniverse"
+      "ApocalypticShadow"
     ]
   }
 }

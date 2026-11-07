@@ -12,6 +12,10 @@
       "name": "Weekly",
       "help": ""
     },
+    "Roguelike": {
+      "name": "Roguelike",
+      "help": ""
+    },
     "Tool": {
       "name": "Tools",
       "help": ""
@@ -58,13 +62,21 @@
       "name": "Echo of War",
       "help": ""
     },
+    "RogueWeekly": {
+      "name": "Simulated Universe weekly points",
+      "help": "The three modes share weekly points (currently 18000). Check points and return to the scheduler after every run; wait until the next Monday server reset once full. Configure the selected mode under Roguelike; its independent task need not be enabled. Weekly Divergent Universe uses full runs."
+    },
     "Rogue": {
       "name": "Simulated Universe",
       "help": ""
     },
     "CurrencyWars": {
       "name": "Currency Wars",
-      "help": "Standard/overclock games and takeover"
+      "help": "Start the scheduler from Overview. Other due tasks are checked after each settlement. Standard/overclock games and takeover"
+    },
+    "DivergentUniverse": {
+      "name": "Divergent Universe",
+      "help": "Start the scheduler from Overview. Other due tasks are checked after each settlement."
     },
     "Daemon": {
       "name": "Dialogue Clicker",
@@ -85,10 +97,6 @@
     "ApocalypticShadow": {
       "name": "Apocalyptic Shadow",
       "help": "Auto challenge Apocalyptic Shadow"
-    },
-    "DivergentUniverse": {
-      "name": "Divergent Universe",
-      "help": "Run with the current in-game team and difficulty. CN Android UI only."
     }
   },
   "Scheduler": {
@@ -1811,6 +1819,29 @@
       "help": ""
     }
   },
+  "RogueWeekly": {
+    "_info": {
+      "name": "Shared weekly points",
+      "help": ""
+    },
+    "Mode": {
+      "name": "Mode",
+      "help": "The three modes share weekly points (currently 18000). Check points and return to the scheduler after every run; wait until the next Monday server reset once full. Configure the selected mode under Roguelike; its independent task need not be enabled. Weekly Divergent Universe uses full runs.",
+      "Rogue": "Simulated Universe",
+      "DivergentUniverse": "Divergent Universe",
+      "CurrencyWars": "Currency Wars"
+    }
+  },
+  "RogueBatch": {
+    "_info": {
+      "name": "Run progress",
+      "help": ""
+    },
+    "CompletedRuns": {
+      "name": "Completed runs",
+      "help": ""
+    }
+  },
   "RogueWorld": {
     "_info": {
       "name": "Simulated Universe Settings",
@@ -1931,7 +1962,7 @@
   },
   "RogueStorage": {
     "_info": {
-      "name": "Simulated Universe Records",
+      "name": "Shared weekly points",
       "help": ""
     },
     "SimulatedUniverse": {
@@ -2160,6 +2191,10 @@
     "Runs": {
       "name": "Completed runs",
       "help": "0 runs continuously. Resuming preserves the current run and mode."
+    },
+    "RepeatDaily": {
+      "name": "Repeat daily",
+      "help": ""
     },
     "TeamPreset": {
       "name": "Team preset to download",

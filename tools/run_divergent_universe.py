@@ -42,4 +42,11 @@ task = DivergentUniverse(config=config, device=Device(config))
 if args.prepare_only:
     task.prepare_entry()
 else:
-    task.run()
+    # This development entry runs outside SRC's scheduler. Production calls
+    # return after one settlement; preserve --runs for standalone experiments.
+    completed = 0
+    while config.DivergentUniverse_Runs == 0 or completed < config.DivergentUniverse_Runs:
+        count = task.run(scheduled=False)
+        if not count:
+            break
+        completed += count

@@ -15,8 +15,9 @@ class ManualConfig:
     > Weekly > Ornament > Dungeon > Assignment
     > BattlePass > DailyQuest
     > Freebies > DataUpdate
-    > CurrencyWars > Rogue
+    > RogueWeekly > CurrencyWars > DivergentUniverse > Rogue
     """
+    SCHEDULER_ROGUELIKE_TASKS = ('Rogue', 'CurrencyWars', 'DivergentUniverse')
 
     """
     module.assets

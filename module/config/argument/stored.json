@@ -1197,6 +1197,19 @@
     "order": 0,
     "color": "#777777"
   },
+  "SimulatedUniverse": {
+    "name": "SimulatedUniverse",
+    "path": "RogueWeekly.RogueStorage.SimulatedUniverse",
+    "i18n": "RogueStorage.SimulatedUniverse.name",
+    "stored": "StoredSimulatedUniverse",
+    "attrs": {
+      "time": "2020-01-01 00:00:00",
+      "total": 0,
+      "value": 0
+    },
+    "order": 0,
+    "color": "#8fb5fe"
+  },
   "SimulatedUniverseFarm": {
     "name": "SimulatedUniverseFarm",
     "path": "Rogue.RogueWorld.SimulatedUniverseFarm",
@@ -1209,18 +1222,5 @@
     },
     "order": 0,
     "color": "#777777"
-  },
-  "SimulatedUniverse": {
-    "name": "SimulatedUniverse",
-    "path": "Rogue.RogueStorage.SimulatedUniverse",
-    "i18n": "RogueStorage.SimulatedUniverse.name",
-    "stored": "StoredSimulatedUniverse",
-    "attrs": {
-      "time": "2020-01-01 00:00:00",
-      "total": 0,
-      "value": 0
-    },
-    "order": 0,
-    "color": "#8fb5fe"
   }
 }

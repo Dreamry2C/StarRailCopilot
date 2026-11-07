@@ -87,7 +87,7 @@ class CurrencyWars(UI):
         operator.save('navigation_failed')
         raise RequestHumanTakeover('无法从指南进入货币战争')
 
-    def run(self):
+    def run(self, *, scheduled=True):
         from filelock import FileLock, Timeout
         from tasks.currency_wars.progress import Campaign
         lock_path = STATE_DIR / f'{self.config.config_name}.controller.lock'
@@ -96,7 +96,12 @@ class CurrencyWars(UI):
             with FileLock(str(lock_path), timeout=0):
                 try:
                     self._validate_settings()
-                    return self._run_with_recovery(Campaign(profile=self.config.config_name))
+                    campaign = Campaign(profile=self.config.config_name)
+                    self._run_with_recovery(campaign)
+                    if scheduled:
+                        self._finish_task(campaign)
+                    from tasks.rogue_weekly.scheduler import leave_lobby
+                    leave_lobby(self)
                 except TaskEnd:
                     Campaign(profile=self.config.config_name).heartbeat('stopped')
                     raise
@@ -152,7 +157,8 @@ class CurrencyWars(UI):
         self.device.click_record_clear()
 
     def _run_with_recovery(self, campaign):
-        requested = self.config.CurrencyWars_Runs
+        # A scheduler invocation owns exactly one settlement, including recovery.
+        requested = 1
         limit = self.config.CurrencyWars_RecoveryRetries
         campaign.reload()
         initial_completed = sum(item['profile'] == campaign.profile for item in campaign.data['settlements'])
@@ -190,7 +196,6 @@ class CurrencyWars(UI):
                 logger.warning(f'CW recovery {self._recovery_attempts}/{limit}: restart game, then resume the saved run: {error}')
                 campaign.heartbeat('recovering', error=error)
                 restart = True
-        self._finish_task(campaign)
 
     def _run(self, runtimes=None):
         logger.hr('Currency Wars', level=1)
@@ -222,12 +227,6 @@ class CurrencyWars(UI):
         logger.info(f'Currency Wars finished: {game.completed_runs}')
 
     def _finish_task(self, campaign):
-        with self.config.multi_set():
-            self.config.task_delay(server_update=True)
-            if not self.config.CurrencyWars_RepeatDaily:
-                self.config.Scheduler_Enable = False
-        campaign.heartbeat('finished')
-        if not self.config.CurrencyWars_RepeatDaily and self.config.stop_event is not None:
-            self.config.get_next_task()
-            if not self.config.pending_task and not self.config.waiting_task:
-                self.config.stop_event.set()
+        from tasks.rogue_weekly.scheduler import finish_batch
+        finished = finish_batch(self.config, self.config.CurrencyWars_Runs, self.config.CurrencyWars_RepeatDaily)
+        campaign.heartbeat('finished' if finished else 'waiting')

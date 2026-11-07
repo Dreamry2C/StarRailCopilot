@@ -233,6 +233,11 @@ class AzurLaneConfig(ConfigUpdater, ManualConfig, GeneratedConfig, ConfigWatcher
         f.load(self.SCHEDULER_PRIORITY)
         if pending:
             pending = f.apply(pending)
+            # Independent roguelikes share the lowest priority. A continuous
+            # mode moves NextRun after each settlement so other due modes get a turn.
+            roguelikes = [task for task in pending if task.command in self.SCHEDULER_ROGUELIKE_TASKS]
+            pending = [task for task in pending if task.command not in self.SCHEDULER_ROGUELIKE_TASKS]
+            pending += sorted(roguelikes, key=operator.attrgetter('next_run'))
         if waiting:
             waiting = f.apply(waiting)
             waiting = sorted(waiting, key=operator.attrgetter("next_run"))
@@ -306,7 +311,7 @@ class AzurLaneConfig(ConfigUpdater, ManualConfig, GeneratedConfig, ConfigWatcher
                     deep_set(self.data, keys=f"{task}.Scheduler.NextRun", value=now)
 
         limit_next_run(['BattlePass'], limit=now + timedelta(days=40, seconds=-1))
-        limit_next_run(['Weekly'], limit=now + timedelta(days=7, seconds=-1))
+        limit_next_run(['Weekly', 'RogueWeekly', 'DivergentUniverse'], limit=now + timedelta(days=7, seconds=-1))
         limit_next_run(self.args.keys(), limit=now + timedelta(hours=24, seconds=-1))
 
     def override(self, **kwargs):

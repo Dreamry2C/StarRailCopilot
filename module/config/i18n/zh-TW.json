@@ -12,6 +12,10 @@
       "name": "每週",
       "help": ""
     },
+    "Roguelike": {
+      "name": "肉鴿",
+      "help": ""
+    },
     "Tool": {
       "name": "工具",
       "help": ""
@@ -58,13 +62,21 @@
       "name": "歷戰餘響",
       "help": ""
     },
+    "RogueWeekly": {
+      "name": "模擬宇宙週積分",
+      "help": "模擬宇宙、差分宇宙、貨幣戰爭共享週積分上限（目前為18000）。每局結束後檢查積分並返回排程器；滿分後等待下週一伺服器刷新。各模式設定在肉鴿欄配置，無需啟用對應獨立任務。差分宇宙按整局推進。"
+    },
     "Rogue": {
       "name": "模擬宇宙",
       "help": ""
     },
     "CurrencyWars": {
       "name": "Currency Wars",
-      "help": "Standard/overclock games and takeover"
+      "help": "在總覽啟動排程器；每局結算後檢查其他到期任務。 Standard/overclock games and takeover"
+    },
+    "DivergentUniverse": {
+      "name": "Task.DivergentUniverse.name",
+      "help": "在總覽啟動排程器；每局結算後檢查其他到期任務。"
     },
     "Daemon": {
       "name": "劇情連點器",
@@ -85,10 +97,6 @@
     "ApocalypticShadow": {
       "name": "末日幻影",
       "help": "自動挑戰末日幻影"
-    },
-    "DivergentUniverse": {
-      "name": "Task.DivergentUniverse.name",
-      "help": "Task.DivergentUniverse.help"
     }
   },
   "Scheduler": {
@@ -1811,6 +1819,29 @@
       "help": ""
     }
   },
+  "RogueWeekly": {
+    "_info": {
+      "name": "共享週積分",
+      "help": ""
+    },
+    "Mode": {
+      "name": "刷取模式",
+      "help": "模擬宇宙、差分宇宙、貨幣戰爭共享週積分上限（目前為18000）。每局結束後檢查積分並返回排程器；滿分後等待下週一伺服器刷新。各模式設定在肉鴿欄配置，無需啟用對應獨立任務。差分宇宙按整局推進。",
+      "Rogue": "模擬宇宙",
+      "DivergentUniverse": "Task.DivergentUniverse.name",
+      "CurrencyWars": "Currency Wars"
+    }
+  },
+  "RogueBatch": {
+    "_info": {
+      "name": "連續執行",
+      "help": ""
+    },
+    "CompletedRuns": {
+      "name": "已完成局數",
+      "help": ""
+    }
+  },
   "RogueWorld": {
     "_info": {
       "name": "模拟宇宙设置",
@@ -1931,7 +1962,7 @@
   },
   "RogueStorage": {
     "_info": {
-      "name": "模擬宇宙記錄",
+      "name": "共享週積分",
       "help": ""
     },
     "SimulatedUniverse": {
@@ -2043,7 +2074,7 @@
     },
     "Runs": {
       "name": "Runs",
-      "help": ""
+      "help": "0为持续运行；正数为本轮累计结算次数。每局返回调度器，被其他任务插入或重启后继续剩余次数。"
     },
     "RepeatDaily": {
       "name": "RepeatDaily",
@@ -2159,7 +2190,11 @@
     },
     "Runs": {
       "name": "DivergentUniverse.Runs.name",
-      "help": "DivergentUniverse.Runs.help"
+      "help": "0为持续运行；正数为本轮累计结算次数。每局返回调度器，被其他任务插入或重启后继续剩余次数。"
+    },
+    "RepeatDaily": {
+      "name": "每日重複",
+      "help": ""
     },
     "TeamPreset": {
       "name": "DivergentUniverse.TeamPreset.name",

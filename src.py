@@ -80,6 +80,10 @@ class StarRailCopilot(AzurLaneAutoScript):
         from tasks.rogue.rogue import Rogue
         Rogue(config=self.config, device=self.device).run()
 
+    def rogue_weekly(self):
+        from tasks.rogue_weekly.weekly import RogueWeekly
+        RogueWeekly(config=self.config, device=self.device).run()
+
     def ornament(self):
         from tasks.ornament.ornament import Ornament
         Ornament(config=self.config, device=self.device).run()
@@ -103,7 +107,7 @@ class StarRailCopilot(AzurLaneAutoScript):
 
     def divergent_universe(self):
         from tasks.divergent_universe.divergent_universe import DivergentUniverse
-        DivergentUniverse(config=self.config, device=self.device, task="DivergentUniverse").run()
+        DivergentUniverse(config=self.config, device=self.device).run()
 
     def benchmark(self):
         from module.daemon.benchmark import run_benchmark

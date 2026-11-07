@@ -784,7 +784,8 @@ class ConfigUpdater:
         # 3.2
         # ('Weekly.Weekly.Name', 'Weekly.Weekly.Name', convert_32_weekly),
         # 4.5
-        ('Dungeon.DungeonStorage.SimulatedUniverse', 'Rogue.RogueStorage.SimulatedUniverse'),
+        ('Dungeon.DungeonStorage.SimulatedUniverse', 'RogueWeekly.RogueStorage.SimulatedUniverse'),
+        ('Rogue.RogueStorage.SimulatedUniverse', 'RogueWeekly.RogueStorage.SimulatedUniverse'),
     ]
 
     @cached_property
@@ -995,8 +996,8 @@ class ConfigUpdater:
             yield 'CurrencyWars.CurrencyWars.Checkpoints'
         if currency.get('Runs', 0) == 0:
             yield 'CurrencyWars.CurrencyWars.RepeatDaily'
-            yield 'CurrencyWars.Scheduler.NextRun'
-            yield 'CurrencyWars.Scheduler.ServerUpdate'
+        if divergent.get('Runs', 0) == 0:
+            yield 'DivergentUniverse.DivergentUniverse.RepeatDaily'
         if deep_get(data, 'Dungeon.TrailblazePower.UseFuel') == False:
             yield 'Dungeon.TrailblazePower.FuelReserve'
         if deep_get(data, 'Dungeon.TrailblazePower.UseFuel') == False:

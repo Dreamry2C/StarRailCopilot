@@ -112,7 +112,7 @@ class DivergentUniverse(DungeonUINav, MapControl):
                 self.device.__dict__['screenshot_deque'] = deque(
                     self.device.screenshot_deque, maxlen=original_limit)
 
-    def run(self):
+    def run(self, *, scheduled=True):
         if self.config.Emulator_GameLanguage != 'cn':
             raise RequestHumanTakeover('差分宇宙当前适配简体中文 Android 界面')
         if self.config.DivergentUniverse_Runs < 0 or self.config.DivergentUniverse_RecoveryRetries < 0:
@@ -125,7 +125,7 @@ class DivergentUniverse(DungeonUINav, MapControl):
                 self.progress.record('task_started', intended_mode=self.config.DivergentUniverse_Mode,
                                      intended_calculation=self.config.DivergentUniverse_Calculation)
                 completed = 0
-                while self.config.DivergentUniverse_Runs == 0 or completed < self.config.DivergentUniverse_Runs:
+                while completed < 1:
                     try:
                         self._initialize()
                         if not self.go_to_lobby():
@@ -137,8 +137,6 @@ class DivergentUniverse(DungeonUINav, MapControl):
                         self.progress.finish(result)
                         completed += 1
                         logger.info(f'DU completed run {completed}: {result}')
-                        self.config.load()
-                        self.config.bind(self.config.task)
                     except TaskEnd:
                         self.progress.save('stopped')
                         raise
@@ -157,9 +155,22 @@ class DivergentUniverse(DungeonUINav, MapControl):
                         logger.exception(f'DU task failed: {type(error).__name__}: {error}')
                         save_error_log(config=self.config, device=self.device, png_compress_level=1)
                         self.recover_checkpoint(error)
+                if scheduled:
+                    from tasks.rogue_weekly.scheduler import finish_batch
+                    if completed:
+                        finish_batch(self.config, self.config.DivergentUniverse_Runs,
+                                     self.config.DivergentUniverse_RepeatDaily, completed=completed)
+                    else:
+                        from module.config.utils import get_server_next_monday_update
+                        with self.config.multi_set():
+                            self.config.RogueBatch_CompletedRuns = 0
+                            self.config.task_delay(target=get_server_next_monday_update(self.config.Scheduler_ServerUpdate))
                 if self.config.DivergentUniverse_ClaimRewards:
                     self.claim_points()
                 self.progress.save('finished')
+                from tasks.rogue_weekly.scheduler import leave_lobby
+                leave_lobby(self)
+                return completed
         except Timeout:
             raise RequestHumanTakeover('该配置已有货币战争或差分宇宙控制进程，请先停止它')
 

@@ -154,9 +154,9 @@ class NativeStrategy:
             self.op.sleep(0.5)
 
     @staticmethod
-    def card_slots(image):
+    def card_slots(image, row_y=(320, 524)):
         result = []
-        for y, xs in [(320, (570, 680, 790, 900)), (524, (312, 417, 523, 629, 734, 841, 946, 1051, 1157))]:
+        for y, xs in zip(row_y, ((570, 680, 790, 900), (312, 417, 523, 629, 734, 841, 946, 1051, 1157))):
             for x in xs:
                 crop = image[y - 24:y + 24, x - 22:x + 22]
                 if crop.std(axis=(0, 1)).mean() > 22:
@@ -176,9 +176,11 @@ class NativeStrategy:
         mask = cv2.inRange(hsv, np.array((8, 80, 160)), np.array((42, 255, 255)))
         _, _, stats, _ = cv2.connectedComponentsWithStats(mask)
         stars = 0
-        for _, _, w, h, area in stats[1:]:
+        for left, _, w, h, area in stats[1:]:
             # A glow joined to the portrait can extend a star group to 20px.
-            if 10 <= h <= 22 and 9 <= w <= 44 and 25 <= area <= 350:
+            # Stars are centered; gold clothing at the crop edges is not a star.
+            if (10 <= left and left + w <= crop.shape[1] - 10
+                    and 10 <= h <= 22 and 9 <= w <= 44 and 25 <= area <= 350):
                 stars += max(1, round(w / 13))
         return min(3, stars)
 
@@ -216,9 +218,12 @@ class NativeStrategy:
                 if 380 <= right[0] - left[0] <= 420:
                     top, bottom = min(left[1], right[1]), min(left[2], right[2])
                     if bottom - top >= 500:
-                        pairs.append((left[0], top, right[0] - left[0], bottom - top))
+                        alignment = abs(left[1] - right[1]) + abs(left[2] - right[2])
+                        pairs.append((left[0], top, right[0] - left[0], bottom - top, alignment))
         if pairs:
-            return min(pairs, key=lambda b: abs(b[2] - 401))
+            # Background table edges can also be 401px apart. The popup's
+            # left and right borders should share their top and bottom.
+            return min(pairs, key=lambda b: abs(b[2] - 401) + b[4])[:4]
         hsv = cv2.cvtColor(image, cv2.COLOR_RGB2HSV)
         mask = cv2.inRange(hsv, np.array((10, 55, 100)), np.array((45, 255, 255)))
         mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, np.ones((3, 3), np.uint8))
@@ -341,10 +346,12 @@ class NativeStrategy:
         op = self.op
         for _ in range(8):
             op.snapshot()
-            front = op.text('前台区域', (0.18, 0.28, 0.45, 0.40))
-            back = op.text('后台区域', (0.18, 0.57, 0.45, 0.66))
+            front = op.text('前台区域', (0.18, 0.28, 0.45, 0.42))
+            back = op.text('后台区域', (0.18, 0.57, 0.45, 0.71))
             if front and back:
-                return
+                # A guide warning banner shifts both rows down. Anchor portrait
+                # clicks and star crops to the row labels, including that shift.
+                return front.center[1] + 80, back.center[1] + 80
             # Guide details remember their scroll position. Read the final
             # formation at the top, never the early/mid-game transition cards.
             if op.text('攻略详情', (0, 0, 0.3, 0.12)):
@@ -355,10 +362,10 @@ class NativeStrategy:
 
     def read_detail(self, supplied_code=None):
         op = self.op
-        self.ensure_final_roster_view()
+        row_y = self.ensure_final_roster_view()
         title_boxes = op.read_region((0.025, 0.1, 0.78, 0.165), snapshot=False)
         title = ' '.join(box.source for box in title_boxes)
-        slots = self.card_slots(op.image)
+        slots = self.card_slots(op.image, row_y)
         plan_image = op.image.copy()
         if not slots:
             op.save('native_roster_slots_missing')
@@ -382,7 +389,7 @@ class NativeStrategy:
             character = self.read_character(bounds, index)
             bounds = self.popup_bounds(op.image) or bounds
             character_traits[character.name] = self.read_character_traits(bounds)
-            group = 'on_field' if box.center[1] < 420 else 'off_field'
+            group = 'on_field' if box.center[1] < sum(row_y) / 2 else 'off_field'
             # Keep visible guide targets separate from the purchase policy.
             visible = self.visible_stars(plan_image, box)
             stars = max(1, visible)

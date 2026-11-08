@@ -204,25 +204,27 @@ class NativeStrategy:
 
     @staticmethod
     def popup_bounds(image):
-        edges = cv2.Canny(cv2.cvtColor(image, cv2.COLOR_RGB2GRAY), 30, 100)
-        lines = cv2.HoughLinesP(edges, 1, np.pi / 180, 40, minLineLength=400, maxLineGap=100)
-        vertical = []
-        if lines is not None:
-            for line in lines:
-                x1, y1, x2, y2 = map(int, line[0])
-                if abs(x1 - x2) <= 2 and abs(y1 - y2) >= 450:
-                    vertical.append((round((x1 + x2) / 2), min(y1, y2), max(y1, y2)))
+        # The popup has solid colored side borders. Hough lines can merge
+        # these with the background or start below the character name.
+        pixels = image.astype(np.int16)
+        flat = np.max(np.abs(pixels[1:] - pixels[:-1]), axis=2) <= 2
+        colored = pixels[:-1].max(axis=2) - pixels[:-1].min(axis=2) >= 35
+        mask = (flat & colored).astype(np.uint8) * 255
+        mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, np.ones((450, 1), np.uint8))
+        contours, _ = cv2.findContours(mask, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+        vertical = [cv2.boundingRect(contour) for contour in contours]
+        vertical = sorted((x, y, y + h) for x, y, w, h in vertical if w <= 3 and h >= 500 and y > 0)
         pairs = []
-        for left in sorted(vertical):
-            for right in sorted(vertical):
+        for left in vertical:
+            for right in vertical:
                 if 380 <= right[0] - left[0] <= 420:
-                    top, bottom = min(left[1], right[1]), min(left[2], right[2])
-                    if bottom - top >= 500:
-                        alignment = abs(left[1] - right[1]) + abs(left[2] - right[2])
+                    top, bottom = max(left[1], right[1]), min(left[2], right[2])
+                    alignment = abs(left[1] - right[1]) + abs(left[2] - right[2])
+                    middle = (top + bottom) // 2
+                    same_color = np.max(np.abs(pixels[middle, left[0]] - pixels[middle, right[0]])) <= 5
+                    if bottom - top >= 500 and alignment <= 10 and same_color:
                         pairs.append((left[0], top, right[0] - left[0], bottom - top, alignment))
         if pairs:
-            # Background table edges can also be 401px apart. The popup's
-            # left and right borders should share their top and bottom.
             return min(pairs, key=lambda b: abs(b[2] - 401) + b[4])[:4]
         hsv = cv2.cvtColor(image, cv2.COLOR_RGB2HSV)
         mask = cv2.inRange(hsv, np.array((10, 55, 100)), np.array((45, 255, 255)))

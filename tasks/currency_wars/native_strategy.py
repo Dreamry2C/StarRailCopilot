@@ -1,5 +1,6 @@
 """Read a native game strategy page instead of requiring a hand-written roster."""
 import hashlib
+import difflib
 import json
 from pathlib import Path
 import re
@@ -28,8 +29,9 @@ class NativeStrategy:
             op.snapshot()
             if op.dismiss_currency_tutorial():
                 continue
-            if op.text('积分线已更新', (0.3, 0.35, 0.7, 0.62)):
-                op.sleep(2)
+            weekly_update = op.text('积分线已更新', (0.3, 0.35, 0.7, 0.62))
+            if weekly_update:
+                op.click_box(weekly_update, after_sleep=0.8)
                 continue
             if op.text('积分奖励', (0, 0.2, 0.3, 0.35)):
                 op.press_key('esc')
@@ -92,7 +94,7 @@ class NativeStrategy:
             if choices:
                 title = campaign.choose([b.source for b in choices], remember=False)
                 op.click_box(next(b for b in choices if b.source == title), after_sleep=1)
-                self.wait_detail()
+                self.wait_detail(title=title)
                 return self.read_detail()
             op.device.swipe((1180, 540), (1180, 235), duration=(0.2, 0.3), name='CW_GUIDE_NEXT')
             op.sleep(0.3)
@@ -130,9 +132,10 @@ class NativeStrategy:
         self.wait_detail()
         return self.read_detail(code) if read else None
 
-    def wait_detail(self, timeout=45):
+    def wait_detail(self, timeout=45, title=None):
         op = self.op
         deadline = time.monotonic() + timeout
+        retry_at = time.monotonic() + 2
         # Native guides can remain in a black loading transition. Wait
         # for the detail header and its footer instead of rejecting a valid
         # code after only twenty fast snapshots (about six seconds).
@@ -141,6 +144,17 @@ class NativeStrategy:
             if (op.text('攻略详情', (0, 0, 0.3, 0.12))
                     and op.text('复制攻略码', (0, 0.85, 0.3, 0.98))):
                 return
+            if (title and time.monotonic() >= retry_at
+                    and op.text('热门攻略', (0.25, 0.07, 0.65, 0.18))):
+                # The first tap can stop a moving list instead of opening it.
+                # Re-read the selected title's position; never reuse old coordinates
+                # or tap through a loading transition. Allow small OCR differences.
+                matches = [box for box in op.read_region((0.025, 0.24, 0.80, 0.85), snapshot=False)
+                           if '【' in box.source and '】' in box.source
+                           and difflib.SequenceMatcher(None, normalize(title), normalize(box.source)).ratio() >= 0.85]
+                if len(matches) == 1:
+                    op.click_box(matches[0], after_sleep=0.3)
+                retry_at = time.monotonic() + 2
             op.sleep(0.3)
         op.save('native_detail_timeout')
         raise TimeoutError('原生攻略详情加载超时，尚未确认导入结果')

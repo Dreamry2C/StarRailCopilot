@@ -1060,6 +1060,11 @@ class MobileCurrencyWars(StrategyEngine):
                 raise RuntimeError('商店金币未能识别；停止购物避免错误花费')
             level = self.get_level()
             op.snapshot()
+            if op.text_ocr('自动刷新', (0.85, 0.4, 1, 0.65)):
+                # Automatic shop rolls temporarily replace the refresh button.
+                # Re-read offers and budget after the countdown, before spending.
+                op.sleep(0.3)
+                continue
             names = op.read_shop_names()
             prices = op.read_shop_prices()
             logger.attr('CW shop', [(box.source, box.center[0]) for box in names])
@@ -1139,6 +1144,9 @@ class MobileCurrencyWars(StrategyEngine):
             missing = any(copies.get(name, 0) < 3 ** (stars - 1) for name, stars in self.strategy_characters.items())
             if level >= search_level and missing and self.in_hand_character_count < 8 and coins - 2 >= self.min_coins:
                 op.snapshot()
+                if op.text_ocr('自动刷新', (0.85, 0.4, 1, 0.65)):
+                    op.sleep(0.3)
+                    continue
                 if not op.click_text('刷新', (0.85, 0.4, 1, 0.65), after_sleep=0.3):
                     raise RuntimeError('手机商店刷新按钮未识别')
                 after = self.get_coins()

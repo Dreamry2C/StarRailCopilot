@@ -218,16 +218,28 @@ class NativeStrategy:
 
     @staticmethod
     def popup_bounds(image):
-        # The popup has solid colored side borders. Hough lines can merge
-        # these with the background or start below the character name.
+        # The popup has solid side borders. Gray borders need edge contrast;
+        # colored borders can blend into the background. Hough lines can merge
+        # either with the background or start below the character name.
         pixels = image.astype(np.int16)
         flat = np.max(np.abs(pixels[1:] - pixels[:-1]), axis=2) <= 2
         colored = pixels[:-1].max(axis=2) - pixels[:-1].min(axis=2) >= 35
-        mask = (flat & colored).astype(np.uint8) * 255
-        mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, np.ones((450, 1), np.uint8))
-        contours, _ = cv2.findContours(mask, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
-        vertical = [cv2.boundingRect(contour) for contour in contours]
-        vertical = sorted((x, y, y + h) for x, y, w, h in vertical if w <= 3 and h >= 500 and y > 0)
+        contrast = np.zeros(image.shape[:2], dtype=bool)
+        contrast[:, 1:-1] = ((np.max(np.abs(pixels[:, 1:-1] - pixels[:, :-2]), axis=2) >= 20)
+                            | (np.max(np.abs(pixels[:, 1:-1] - pixels[:, 2:]), axis=2) >= 20))
+        vertical = set()
+        for border in (colored, contrast[:-1]):
+            # Keep the masks separate so background edges cannot widen an
+            # otherwise isolated colored border beyond the accepted thickness.
+            mask = (flat & border).astype(np.uint8) * 255
+            mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, np.ones((450, 1), np.uint8))
+            contours, _ = cv2.findContours(mask, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+            for contour in contours:
+                x, y, w, h = cv2.boundingRect(contour)
+                if w <= 3 and h >= 500 and y > 0:
+                    for column in range(x, x + w):
+                        vertical.add((column, y, y + h))
+        vertical = sorted(vertical)
         pairs = []
         for left in vertical:
             for right in vertical:

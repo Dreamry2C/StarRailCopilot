@@ -596,6 +596,12 @@
         "display": "display",
         "stored": "StoredPlanner"
       },
+      "Item_Ravenous_Baby_Tooth": {
+        "type": "planner",
+        "value": {},
+        "display": "display",
+        "stored": "StoredPlanner"
+      },
       "Item_Squirming_Core": {
         "type": "planner",
         "value": {},
@@ -684,6 +690,7 @@
         "display": "hide",
         "option": [
           "_none_",
+          "AeonAha",
           "Pearl",
           "RobinSummeretto",
           "AventurineWaveflair",
@@ -786,6 +793,7 @@
         "display": "hide",
         "option": [
           "_none_",
+          "Upon_the_First_Echo_of_Aha",
           "Summer_Rides_the_Surf",
           "Rise_and_Sing",
           "A_Star_That_Lights_the_Night",
@@ -858,6 +866,7 @@
           "But_the_Battle_Isn_t_Over",
           "Something_Irreplaceable",
           "Night_on_the_Milky_Way",
+          "See_You_at_the_World_End",
           "Race_to_the_Horizon",
           "Tomorrow_Together",
           "Fly_Into_a_Pink_Tomorrow",
@@ -991,6 +1000,7 @@
         "display": "hide",
         "option": [
           "_none_",
+          "Divergent_Universe_Dramatis_Personae",
           "Divergent_Universe_Bugs_Incoming",
           "Divergent_Universe_Gilded_Recollection",
           "Divergent_Universe_Within_the_West_Wind",
@@ -1330,6 +1340,7 @@
         "value": "FirstCharacter",
         "option": [
           "FirstCharacter",
+          "AeonAha",
           "Pearl",
           "RobinSummeretto",
           "AventurineWaveflair",
@@ -1534,6 +1545,7 @@
         "type": "select",
         "value": "Divergent_Universe_Eternal_Comedy",
         "option": [
+          "Divergent_Universe_Dramatis_Personae",
           "Divergent_Universe_Bugs_Incoming",
           "Divergent_Universe_Gilded_Recollection",
           "Divergent_Universe_Within_the_West_Wind",
@@ -1608,6 +1620,7 @@
         "value": "FirstCharacter",
         "option": [
           "FirstCharacter",
+          "AeonAha",
           "Pearl",
           "RobinSummeretto",
           "AventurineWaveflair",
@@ -2230,6 +2243,7 @@
         "value": "FirstCharacter",
         "option": [
           "FirstCharacter",
+          "AeonAha",
           "Pearl",
           "RobinSummeretto",
           "AventurineWaveflair",
